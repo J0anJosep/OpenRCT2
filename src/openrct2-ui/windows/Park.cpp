@@ -361,6 +361,12 @@ static void WindowParkPrepareWindowTitleText()
     auto& park = OpenRCT2::GetContext()->GetGameState()->GetPark();
     auto parkName = park.Name.c_str();
 
+    rct_string_id localisedStringIds[3];
+    if (language_get_localised_scenario_strings(parkName, localisedStringIds) && localisedStringIds[1] != STR_NONE)
+    {
+        parkName = language_get_string(localisedStringIds[1]);
+    }
+
     auto ft = Formatter::Common();
     ft.Add<rct_string_id>(STR_STRING);
     ft.Add<const char*>(parkName);
@@ -543,15 +549,9 @@ static void WindowParkEntranceInvalidate(rct_window* w)
 
     WindowParkSetPressedTab(w);
 
-    // Set open / close park button state
-    {
-        auto& park = OpenRCT2::GetContext()->GetGameState()->GetPark();
-        auto parkName = park.Name.c_str();
+    WindowParkPrepareWindowTitleText();
 
-        auto ft = Formatter::Common();
-        ft.Add<rct_string_id>(STR_STRING);
-        ft.Add<const char*>(parkName);
-    }
+    // Set open / close park button state
     window_park_entrance_widgets[WIDX_OPEN_OR_CLOSE].image = park_is_open() ? SPR_OPEN : SPR_CLOSED;
     window_park_entrance_widgets[WIDX_CLOSE_LIGHT].image = SPR_G2_RCT1_CLOSE_BUTTON_0 + !park_is_open() * 2
         + WidgetIsPressed(w, WIDX_CLOSE_LIGHT);
